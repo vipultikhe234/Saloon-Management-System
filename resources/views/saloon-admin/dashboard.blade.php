@@ -41,7 +41,9 @@
                             @if($saloon->isSubscriptionActive())
                                 <div class="px-3 py-1 bg-green-500 rounded-full text-xs font-bold uppercase tracking-tight">Active</div>
                             @else
-                                <div class="px-3 py-1 bg-red-500 rounded-full text-xs font-bold uppercase tracking-tight">Expired</div>
+                                <div class="px-3 py-1 bg-red-500 rounded-full text-xs font-bold uppercase tracking-tight">
+                                    {{ !$saloon->subscription_expires_at ? 'Inactive' : 'Expired' }}
+                                </div>
                             @endif
                             <div class="text-indigo-100 text-xs mt-1">Status</div>
                         </div>
@@ -63,7 +65,11 @@
                     </div>
                     <div class="ml-3">
                         <p class="text-sm text-red-700">
-                            <span class="font-bold">Important:</span> Your subscription has expired. Your saloon is currently <span class="font-bold">Hidden</span> from customers. Please recharge to resume services.
+                            @if(!$saloon->subscription_expires_at)
+                                <span class="font-bold">Welcome!</span> To start using the application and managing your saloon, you need to subscribe to a plan. <span class="font-bold">Please make a payment to activate your account.</span>
+                            @else
+                                <span class="font-bold">Important:</span> Your subscription has expired. Your saloon is currently <span class="font-bold">Hidden</span> from customers. Please recharge to resume services.
+                            @endif
                         </p>
                     </div>
                 </div>
@@ -150,11 +156,17 @@
                                     </td>
                                     <td>
                                         <div>
-                                            <p class="font-semibold">{{ $appointment->user->name }}</p>
-                                            <p class="text-sm text-gray-500">{{ $appointment->user->phone }}</p>
+                                            <p class="font-semibold">{{ $appointment->user ? $appointment->user->name : $appointment->guest_name }}</p>
+                                            <p class="text-sm text-gray-500">{{ $appointment->user ? $appointment->user->phone : 'Guest' }}</p>
                                         </div>
                                     </td>
-                                    <td>{{ $appointment->service->name }}</td>
+                                    <td>
+                                        @if($appointment->services->count() > 0)
+                                            {{ $appointment->services->pluck('name')->join(', ') }}
+                                        @else
+                                            N/A
+                                        @endif
+                                    </td>
                                     <td>{{ $appointment->staff->name ?? 'Not Assigned' }}</td>
                                     <td class="font-semibold">₹{{ number_format($appointment->final_amount, 2) }}</td>
                                     <td>
@@ -223,8 +235,14 @@
                     @forelse($recentAppointments->take(5) as $appointment)
                         <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-all">
                             <div>
-                                <p class="font-semibold text-gray-800">{{ $appointment->user->name }}</p>
-                                <p class="text-sm text-gray-500">{{ $appointment->service->name }}</p>
+                                <p class="font-semibold text-gray-800">{{ $appointment->user ? $appointment->user->name : $appointment->guest_name }}</p>
+                                <p class="text-sm text-gray-500">
+                                    @if($appointment->services->count() > 0)
+                                        {{ $appointment->services->pluck('name')->join(', ') }}
+                                    @else
+                                        N/A
+                                    @endif
+                                </p>
                                 <p class="text-xs text-gray-400 mt-1">
                                     {{ $appointment->appointment_date->format('M d, Y') }} • 
                                     {{ date('h:i A', strtotime($appointment->appointment_time)) }}

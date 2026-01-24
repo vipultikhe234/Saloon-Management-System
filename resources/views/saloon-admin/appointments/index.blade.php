@@ -52,11 +52,17 @@
                         #{{ substr($apt->appointment_number, -6) }}
                     </td>
                     <td class="py-4 px-4">
-                        <div class="font-bold text-gray-800">{{ $apt->user->name }}</div>
-                        <div class="text-xs text-gray-500">{{ $apt->user->phone }}</div>
+                        <div class="font-bold text-gray-800">{{ $apt->user ? $apt->user->name : $apt->guest_name }}</div>
+                        <div class="text-xs text-gray-500">{{ $apt->user ? $apt->user->phone : 'Guest' }}</div>
                     </td>
                     <td class="py-4 px-4">
-                        <div class="text-sm font-semibold text-indigo-600">{{ $apt->service->name }}</div>
+                        <div class="text-sm font-semibold text-indigo-600">
+                            @if($apt->services->count() > 0)
+                                {{ $apt->services->pluck('name')->join(', ') }}
+                            @else
+                                N/A
+                            @endif
+                        </div>
                         <div class="text-xs text-gray-500">
                             Staff: {{ $apt->staff ? $apt->staff->name : 'Unassigned' }}
                         </div>

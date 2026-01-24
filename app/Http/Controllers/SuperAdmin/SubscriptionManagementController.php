@@ -49,7 +49,7 @@ class SubscriptionManagementController extends Controller
         }
 
         $saloon->update([
-            'subscription_expires_at' => $currentExpiry->addMonths($request->months)
+            'subscription_expires_at' => $currentExpiry->addMonths((int) $request->months)
         ]);
 
         return back()->with('success', "Subscription for {$saloon->name} extended by {$request->months} months.");

@@ -12,9 +12,13 @@
             <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Booking Information</h3>
             <div class="grid grid-cols-2 gap-6">
                 <div>
-                    <p class="text-xs text-gray-500 uppercase">Service</p>
-                    <p class="font-semibold text-gray-800">{{ $appointment->service->name }}</p>
-                    <p class="text-sm text-gray-600">{{ $appointment->service->duration_minutes }} mins</p>
+                    <p class="text-xs text-gray-500 uppercase">Service(s)</p>
+                    @if($appointment->services->count() > 0)
+                        <p class="font-semibold text-gray-800">{{ $appointment->services->pluck('name')->join(', ') }}</p>
+                        <p class="text-sm text-gray-600">{{ $appointment->duration_minutes }} mins total</p>
+                    @else
+                        <p class="font-semibold text-gray-800">N/A</p>
+                    @endif
                 </div>
                 <div>
                     <p class="text-xs text-gray-500 uppercase">Status</p>
@@ -37,12 +41,16 @@
             <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Customer Details</h3>
             <div class="flex items-center gap-4">
                 <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold text-xl">
-                    {{ substr($appointment->user->name, 0, 1) }}
+                    {{ substr($appointment->user ? $appointment->user->name : $appointment->guest_name, 0, 1) }}
                 </div>
                 <div>
-                    <p class="font-bold text-gray-800">{{ $appointment->user->name }}</p>
-                    <p class="text-sm text-gray-600">{{ $appointment->user->email }}</p>
-                    <p class="text-sm text-gray-600">{{ $appointment->user->phone }}</p>
+                    <p class="font-bold text-gray-800">{{ $appointment->user ? $appointment->user->name : $appointment->guest_name }}</p>
+                    @if($appointment->user)
+                        <p class="text-sm text-gray-600">{{ $appointment->user->email }}</p>
+                        <p class="text-sm text-gray-600">{{ $appointment->user->phone }}</p>
+                    @else
+                        <p class="text-sm text-gray-600">Guest Booking</p>
+                    @endif
                 </div>
             </div>
             @if($appointment->notes)

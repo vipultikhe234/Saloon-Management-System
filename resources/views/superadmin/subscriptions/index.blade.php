@@ -128,18 +128,9 @@
                         </td>
                         <td class="text-right">
                             <div class="flex justify-end gap-2">
-                                <form action="{{ route('admin.subscriptions.extend', $saloon) }}" method="POST" class="inline-flex items-center gap-1">
-                                    @csrf
-                                    <select name="months" class="text-xs border rounded px-1 py-1 focus:ring-1 focus:ring-indigo-300 outline-none">
-                                        <option value="1">1 Month</option>
-                                        <option value="3">3 Months</option>
-                                        <option value="6">6 Months</option>
-                                        <option value="12">1 Year</option>
-                                    </select>
-                                    <button type="submit" class="p-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition-colors" title="Extend Subscription">
-                                        <i class="fas fa-plus-circle"></i>
-                                    </button>
-                                </form>
+                                <a href="{{ route('admin.saloons.show', $saloon) }}" class="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors" title="View Details">
+                                    <i class="fas fa-eye"></i>
+                                </a>
                                 <a href="{{ route('admin.saloons.edit', $saloon) }}" class="p-2 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors" title="Edit Saloon">
                                     <i class="fas fa-edit"></i>
                                 </a>

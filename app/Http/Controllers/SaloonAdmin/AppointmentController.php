@@ -33,7 +33,7 @@ class AppointmentController extends Controller
     {
         $saloon = $this->getSaloon();
         $query = Appointment::where('saloon_id', $saloon->id)
-            ->with(['user', 'service', 'staff']);
+            ->with(['user', 'services', 'staff']);
 
         // Filters
         if ($request->filled('status')) {
@@ -56,6 +56,7 @@ class AppointmentController extends Controller
     public function show(Appointment $appointment)
     {
         $this->authorizeAppointment($appointment);
+        $appointment->load(['user', 'services', 'staff']);
         return view('saloon-admin.appointments.show', compact('appointment'));
     }
 

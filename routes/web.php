@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 // Public Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/saloons', [HomeController::class, 'saloons'])->name('saloons');
-Route::get('/saloon/{slug}', [HomeController::class, 'saloonDetail'])->name('saloon.detail');
+
 
 // Booking Routes (Guest accessible)
 Route::get('user/book/{saloon}', [BookingController::class, 'create'])->name('user.booking.create');
@@ -115,3 +115,6 @@ Route::middleware(['auth', 'role:saloon_admin'])->prefix('saloon-admin')->name('
 });
 
 require __DIR__.'/auth.php';
+
+// Wildcard route moved to the end to prevent conflict with specific routes like saloon/login
+Route::get('/saloon/{slug}', [HomeController::class, 'saloonDetail'])->name('saloon.detail');

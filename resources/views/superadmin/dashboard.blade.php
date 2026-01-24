@@ -65,30 +65,102 @@
                 </a>
             </div>
 
-            <div class="space-y-3">
-                @forelse($recentSaloons as $saloon)
-                    <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-all">
-                        <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center text-white font-bold">
-                                {{ strtoupper(substr($saloon->name, 0, 1)) }}
-                            </div>
-                            <div>
-                                <p class="font-semibold text-gray-800">{{ $saloon->name }}</p>
-                                <p class="text-sm text-gray-500">{{ $saloon->city }}, {{ $saloon->state }}</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-sm text-gray-600 mb-1">Owner: {{ $saloon->owner->name }}</div>
-                            @if($saloon->is_active)
-                                <span class="badge badge-success">Active</span>
-                            @else
-                                <span class="badge badge-danger">Inactive</span>
-                            @endif
-                        </div>
-                    </div>
-                @empty
-                    <p class="text-center text-gray-500 py-8">No saloons found</p>
-                @endforelse
+            <div class="overflow-x-auto">
+                <table class="custom-table w-full">
+                    <thead>
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Saloon</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Owner</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Verification</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Status</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @forelse($recentSaloons as $saloon)
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10">
+                                            <div class="h-10 w-10 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center text-white font-bold">
+                                                {{ strtoupper(substr($saloon->name, 0, 1)) }}
+                                            </div>
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">{{ $saloon->name }}</div>
+                                            <div class="text-sm text-gray-500">{{ $saloon->city }}, {{ $saloon->state }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">{{ $saloon->owner->name }}</div>
+                                    <div class="text-sm text-gray-500">{{ $saloon->owner->phone }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    @if($saloon->is_verified)
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            <i class="fas fa-check-circle mr-1"></i> Verified
+                                        </span>
+                                    @else
+                                        <form action="{{ route('admin.saloons.verify', $saloon) }}" method="POST" class="inline-block">
+                                            @csrf
+                                            <button type="submit" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 hover:bg-yellow-200 cursor-pointer transition-colors" onclick="return confirm('Are you sure you want to verify this saloon?')">
+                                                <i class="fas fa-clock mr-1"></i> Pending Approval
+                                            </button>
+                                        </form>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    @if($saloon->isSubscriptionActive())
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                            <i class="fas fa-credit-card mr-1"></i> Paid
+                                        </span>
+                                        <div class="text-xs text-gray-400 mt-1">Exp: {{ $saloon->subscription_expires_at->format('M d, Y') }}</div>
+                                    @elseif($saloon->subscription_expires_at)
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                            <i class="fas fa-exclamation-circle mr-1"></i> Expired
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                            <i class="fas fa-minus-circle mr-1"></i> Not Subscribed
+                                        </span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    <form action="{{ route('admin.saloons.toggle-status', $saloon) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none {{ $saloon->is_active ? 'bg-green-500' : 'bg-gray-200' }}" role="switch" aria-checked="{{ $saloon->is_active ? 'true' : 'false' }}">
+                                            <span aria-hidden="true" class="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200 {{ $saloon->is_active ? 'translate-x-5' : 'translate-x-0' }}"></span>
+                                        </button>
+                                    </form>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <div class="flex justify-end gap-2">
+                                        <a href="{{ route('admin.saloons.show', $saloon) }}" class="text-indigo-600 hover:text-indigo-900" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ route('admin.saloons.edit', $saloon) }}" class="text-blue-600 hover:text-blue-900" title="Edit Saloon">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form action="{{ route('admin.saloons.login-as', $saloon) }}" method="POST" class="inline-block" target="_blank">
+                                            @csrf
+                                            <button type="submit" class="text-gray-600 hover:text-gray-900" title="Login as Owner" onclick="return confirm('Login as this saloon admin?')">
+                                                <i class="fas fa-sign-in-alt"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                                    No saloons found.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

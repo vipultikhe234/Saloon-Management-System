@@ -10,7 +10,13 @@
     <div class="lg:col-span-2">
         <div class="bg-white rounded-xl shadow-lg p-6">
             <h3 class="text-xl font-bold text-gray-800 mb-6 flex justify-between items-center">
-                <span><i class="fas fa-users text-indigo-500 mr-2"></i>Waiting Queue</span>
+                <div class="flex items-center gap-3">
+                    <span><i class="fas fa-users text-indigo-500 mr-2"></i>Waiting Queue</span>
+                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                        <span id="last-refresh-badge">Live</span>
+                    </span>
+                </div>
                 <span class="bg-indigo-100 text-indigo-800 text-sm px-3 py-1 rounded-full">{{ $queue->count() }} Waiting</span>
             </h3>
 
@@ -23,9 +29,13 @@
                                     {{ $apt->token_number }}
                                 </div>
                                 <div>
-                                    <div class="font-bold text-gray-800 text-lg">{{ $apt->user->name }}</div>
+                                    <div class="font-bold text-gray-800 text-lg">{{ $apt->user ? $apt->user->name : $apt->guest_name }}</div>
                                     <div class="text-sm text-gray-500">
-                                        {{ $apt->service->name }} ({{ $apt->service->duration_minutes }}m)
+                                        @if($apt->services->count() > 0)
+                                            {{ $apt->services->pluck('name')->join(', ') }} ({{ $apt->duration_minutes }}m)
+                                        @else
+                                            N/A
+                                        @endif
                                     </div>
                                     @if($apt->status == 'in_progress')
                                         <div class="text-xs text-indigo-600 font-bold mt-1 uppercase animate-pulse">Now Serving</div>
@@ -84,7 +94,7 @@
                         <div class="flex items-center gap-3">
                             <div class="text-gray-400 font-mono text-sm">#{{ $apt->token_number }}</div>
                             <div>
-                                <div class="font-semibold text-gray-700">{{ $apt->user->name }}</div>
+                                <div class="font-semibold text-gray-700">{{ $apt->user ? $apt->user->name : $apt->guest_name }}</div>
                                 <div class="text-xs text-gray-500">{{ $apt->updated_at->format('h:i A') }}</div>
                             </div>
                         </div>
@@ -99,4 +109,45 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    // Auto-refresh every 10 seconds
+    let autoRefreshInterval;
+    let lastUpdateTime = new Date();
+    
+    function updateLastRefreshTime() {
+        const now = new Date();
+        const seconds = Math.floor((now - lastUpdateTime) / 1000);
+        const badge = document.getElementById('last-refresh-badge');
+        if (badge) {
+            if (seconds < 60) {
+                badge.textContent = `Updated ${seconds}s ago`;
+            } else {
+                badge.textContent = `Updated ${Math.floor(seconds / 60)}m ago`;
+            }
+        }
+    }
+    
+    function startAutoRefresh() {
+        // Refresh page every 10 seconds
+        autoRefreshInterval = setInterval(() => {
+            window.location.reload();
+        }, 10000);
+        
+        // Update "last refresh" badge every second
+        setInterval(updateLastRefreshTime, 1000);
+    }
+    
+    // Start auto-refresh when page loads
+    document.addEventListener('DOMContentLoaded', startAutoRefresh);
+    
+    // Stop auto-refresh when user leaves the page
+    window.addEventListener('beforeunload', () => {
+        if (autoRefreshInterval) {
+            clearInterval(autoRefreshInterval);
+        }
+    });
+</script>
+@endpush
 @endsection

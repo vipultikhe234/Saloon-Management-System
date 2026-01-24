@@ -21,7 +21,7 @@
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    <form method="POST" action="{{ isset($isAdminLogin) && $isAdminLogin ? route('admin.login') : route('login') }}">
+    <form method="POST" action="{{ isset($isAdminLogin) && $isAdminLogin ? route('admin.login') : (isset($isSaloonLogin) && $isSaloonLogin ? route('saloon.login') : route('login')) }}">
         @csrf
 
         <!-- Email Address -->

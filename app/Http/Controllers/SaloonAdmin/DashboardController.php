@@ -48,13 +48,13 @@ class DashboardController extends Controller
                 ->sum('amount'),
         ];
 
-        $todayAppointments = Appointment::with(['user', 'service', 'staff'])
+        $todayAppointments = Appointment::with(['user', 'services', 'staff'])
             ->where('saloon_id', $saloon->id)
             ->whereDate('appointment_date', today())
             ->orderBy('appointment_time')
             ->get();
 
-        $recentAppointments = Appointment::with(['user', 'service', 'staff'])
+        $recentAppointments = Appointment::with(['user', 'services', 'staff'])
             ->where('saloon_id', $saloon->id)
             ->latest()
             ->take(10)

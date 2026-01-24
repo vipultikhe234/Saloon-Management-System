@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('transaction_id')->unique();
             $table->foreignId('appointment_id')->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
             $table->decimal('amount', 10, 2);
             $table->enum('payment_method', ['cash', 'card', 'upi', 'wallet', 'online']);
             $table->enum('status', ['pending', 'completed', 'failed', 'refunded'])->default('pending');

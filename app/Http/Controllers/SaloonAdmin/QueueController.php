@@ -22,7 +22,7 @@ class QueueController extends Controller
         $queue = Appointment::where('saloon_id', $saloon->id)
             ->whereDate('created_at', Carbon::today())
             ->whereIn('status', ['pending', 'confirmed', 'in_progress'])
-            ->with('user', 'service')
+            ->with('user', 'services')
             ->orderBy('token_number', 'asc')
             ->get();
 
@@ -30,7 +30,7 @@ class QueueController extends Controller
         $history = Appointment::where('saloon_id', $saloon->id)
             ->whereDate('created_at', Carbon::today())
             ->whereIn('status', ['completed', 'cancelled'])
-            ->with('user', 'service')
+            ->with('user', 'services')
             ->orderBy('updated_at', 'desc')
             ->take(10)
             ->get();
