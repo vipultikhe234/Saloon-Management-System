@@ -17,7 +17,7 @@
         :root {
             --primary: #6366f1;
             --secondary: #8b5cf6;
-            --accent: #fbbf24;
+            --accent: #ffc107; /* Yellow from screenshot */
         }
 
         body {
@@ -37,9 +37,8 @@
             left: 0;
             right: 0;
             z-index: 1000;
-            background: rgba(30, 27, 75, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: #1e1b4b; /* Dark purple from screenshot */
+            border-bottom: 1px solid rgba(255,255,255,0.05);
             padding: 1rem 5%;
             display: flex;
             justify-content: space-between;
@@ -52,51 +51,49 @@
             gap: 10px;
             color: white !important;
             text-decoration: none;
-            font-weight: 900;
-            font-size: 1.5rem;
+            font-weight: 800;
+            font-size: 1.6rem;
         }
 
         .nav-links {
             display: flex;
             align-items: center;
-            gap: 2rem;
+            gap: 2.5rem;
         }
 
         .nav-links a {
             color: white !important;
             text-decoration: none;
-            font-weight: 600;
+            font-weight: 700;
             font-size: 0.9rem;
             transition: color 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: var(--accent) !important;
         }
 
         .cta-group {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            border-left: 1px solid rgba(255,255,255,0.2);
-            padding-left: 1.5rem;
+            gap: 1.5rem;
+            margin-left: 1.5rem;
         }
-
+        
         .nav-btn {
-            padding: 8px 18px;
+            padding: 10px 24px;
             border-radius: 50px;
             font-weight: 800;
             font-size: 11px;
             text-transform: uppercase;
             text-decoration: none;
             transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .nav-btn-accent { background: var(--accent); color: #1e1b4b !important; }
+        .nav-btn-yellow { background: #ffc107; color: #1e1b4b !important; }
         .nav-btn-white { background: white; color: #1e1b4b !important; }
         
         main {
-            padding-top: 100px; /* Space for fixed nav */
+            padding-top: 80px; /* Space for fixed nav */
             flex-grow: 1;
         }
     </style>
@@ -106,8 +103,8 @@
     <!-- Navbar -->
     <nav class="main-nav">
         <a href="{{ route('home') }}" class="nav-logo">
-            <i class="fas fa-cut" style="color: var(--accent);"></i>
-            <span>Saloon<span style="color: var(--accent);">Manager</span></span>
+            <i class="fas fa-cut"></i>
+            <span>SaloonManager</span>
         </a>
         
         <div class="nav-links">
@@ -119,18 +116,16 @@
                     <a href="{{ 
                         auth()->user()->isSuperAdmin() ? route('admin.dashboard') : 
                         (auth()->user()->isSaloonAdmin() ? route('saloon-admin.dashboard') : route('user.dashboard')) 
-                    }}" class="nav-btn nav-btn-accent">
+                    }}" class="nav-btn nav-btn-yellow">
                         <i class="fas fa-th-large mr-2"></i>Dashboard
                     </a>
                 @else
                     <div class="flex items-center gap-6">
-                        <a href="{{ route('saloon.login') }}" class="font-bold text-xs text-indigo-200 hover:text-white uppercase tracking-wider transition">Saloon Login</a>
-                        <a href="{{ route('saloon.register') }}" class="nav-btn nav-btn-accent shadow-lg shadow-yellow-500/20">Register Salon</a>
+                        <a href="{{ route('saloon.login') }}" class="font-bold text-sm text-white hover:text-gray-200">Saloon Login</a>
+                        <a href="{{ route('saloon.register') }}" class="nav-btn nav-btn-yellow">Register Salon</a>
                         
-                        <div class="w-px h-8 bg-indigo-500/30"></div>
-                        
-                        <a href="{{ route('login') }}" class="font-bold text-xs text-indigo-200 hover:text-white uppercase tracking-wider transition">User Sign In</a>
-                        <a href="{{ route('register') }}" class="nav-btn nav-btn-white shadow-lg">Join Now</a>
+                        <a href="{{ route('login') }}" class="font-bold text-sm text-white hover:text-gray-200 ml-4">User Sign In</a>
+                        <a href="{{ route('register') }}" class="nav-btn nav-btn-white" style="color: #1e1b4b !important;">Join Now</a>
                     </div>
                 @endauth
             </div>

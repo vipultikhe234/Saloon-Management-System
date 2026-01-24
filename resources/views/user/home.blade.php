@@ -77,115 +77,137 @@
 @endpush
 
 @section('content')
-<!-- Premium Hero Section -->
-<section class="hero-premium min-h-[90vh] flex items-center relative pt-20">
-    <!-- Decorative Glows -->
-    <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/30 rounded-full blur-[120px] pointer-events-none"></div>
-    <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px] pointer-events-none"></div>
+<!-- Hero Section -->
+<div class="relative min-h-[800px] flex items-center overflow-hidden bg-[#1e1b4b]">
+    <!-- Animated Background -->
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute -top-[30%] -left-[10%] w-[700px] h-[700px] rounded-full bg-indigo-600/20 blur-[100px] animate-pulse"></div>
+        <div class="absolute top-[20%] -right-[10%] w-[600px] h-[600px] rounded-full bg-purple-600/20 blur-[100px] animate-pulse" style="animation-delay: 2s;"></div>
+        <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150"></div>
+    </div>
 
-    <div class="container mx-auto px-6 relative z-10 grid lg:grid-cols-2 gap-16 items-center">
-        <!-- Text Content -->
-        <div class="text-center lg:text-left pt-10 lg:pt-0">
-            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card-dark text-amber-400 text-xs font-bold uppercase tracking-widest mb-8 border border-white/10">
-                <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-                #1 Salon Booking Platform
-            </div>
-            
-            <h1 class="text-5xl lg:text-7xl font-black text-white leading-[1.1] mb-6 tracking-tight">
-                Elevate Your <br>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-white">Style & Beauty</span>
-            </h1>
-            
-            <p class="text-lg text-indigo-100/80 mb-10 leading-relaxed max-w-xl mx-auto lg:mx-0 font-light">
-                Experience the pinnacle of convenience. Discover verified experts, book instantly, and skip the wait with our live queue tracking.
-            </p>
-
-            <!-- Floating Search Bar -->
-            <div class="glass-panel p-3 rounded-[24px] flex flex-col md:flex-row gap-2 max-w-2xl mx-auto lg:mx-0 transform transition-all hover:scale-[1.01]">
-                <div class="flex-1 bg-gray-50/50 rounded-2xl px-5 py-3 hover:bg-gray-50 transition border border-transparent hover:border-indigo-200">
-                    <label class="block text-[10px] font-black text-indigo-900 uppercase tracking-wider mb-1">Location State</label>
-                    <select id="home-state" class="custom-select w-full bg-transparent border-none p-0 text-gray-800 font-bold focus:ring-0 cursor-pointer">
-                        <option value="">Select State</option>
-                        @foreach($states as $state)
-                            <option value="{{ $state }}">{{ $state }}</option>
-                        @endforeach
-                    </select>
+    <div class="container mx-auto px-6 relative z-10 pt-20">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+            <!-- Left Content -->
+            <div class="text-left space-y-8">
+                <!-- Verified Badge -->
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 backdrop-blur-md shadow-lg shadow-indigo-500/10">
+                    <span class="relative flex h-3 w-3">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+                    </span>
+                    <span class="text-sm font-bold text-white tracking-wide uppercase">Verified Professionals Only</span>
                 </div>
-
-                <div class="w-px bg-gray-200 hidden md:block my-2"></div>
-
-                <div class="flex-1 bg-gray-50/50 rounded-2xl px-5 py-3 hover:bg-gray-50 transition border border-transparent hover:border-indigo-200">
-                    <label class="block text-[10px] font-black text-indigo-900 uppercase tracking-wider mb-1">City / Area</label>
-                    <select id="home-city" class="custom-select w-full bg-transparent border-none p-0 text-gray-800 font-bold focus:ring-0 cursor-pointer">
-                        <option value="">Select City</option>
-                        @foreach($cities as $city)
-                            <option value="{{ $city }}">{{ $city }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <button onclick="filterSaloons()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 md:py-0 rounded-xl font-bold transition-all shadow-lg shadow-indigo-500/30 flex items-center justify-center gap-2 group">
-                    <span>Search</span>
-                    <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
-                </button>
-            </div>
-
-            <div class="mt-8 flex items-center justify-center lg:justify-start gap-8 text-white/60 text-sm font-medium">
-                <span class="flex items-center gap-2"><i class="fas fa-check-circle text-amber-400"></i> Verified Pros</span>
-                <span class="flex items-center gap-2"><i class="fas fa-check-circle text-amber-400"></i> Instant Booking</span>
-                <span class="flex items-center gap-2"><i class="fas fa-check-circle text-amber-400"></i> Pay at Venue</span>
-            </div>
-        </div>
-
-        <!-- Hero Visuals -->
-        <div class="relative hidden lg:block h-[600px]">
-            <!-- Main Image Card -->
-            <div class="absolute top-10 right-10 w-[400px] h-[500px] bg-gray-900 rounded-[40px] overflow-hidden shadow-2xl border-[8px] border-white/10 float-item z-10">
-                <img src="https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Salon Experience" class="w-full h-full object-cover opacity-90 hover:scale-110 transition-transform duration-700">
                 
-                <!-- Floating Badge -->
-                <div class="absolute bottom-8 left-8 right-8 glass-panel p-4 rounded-2xl flex items-center justify-between">
-                    <div>
-                        <p class="text-xs text-gray-500 font-bold uppercase">Average Rating</p>
-                        <div class="flex items-center gap-1 text-amber-400 text-lg">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star-half-alt"></i>
-                            <span class="text-indigo-900 font-black ml-1">4.8</span>
+                <h1 class="text-5xl lg:text-7xl font-black text-white leading-[1.1] tracking-tight">
+                    Book Your <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-amber-500 filter drop-shadow-lg">Perfect Look</span>
+                </h1>
+                
+                <p class="text-lg text-indigo-100/90 leading-relaxed max-w-lg font-medium">
+                    The smartest way to book top-rated salons nearby. View live queue times, skip the wait, and experience premium grooming.
+                </p>
+
+                <!-- Search Bar -->
+                <div class="bg-white p-2 rounded-2xl flex flex-col md:flex-row shadow-2xl shadow-indigo-900/50 max-w-xl border border-white/10 backdrop-blur-sm">
+                    <div class="flex-1 px-5 py-3 border-b md:border-b-0 md:border-r border-gray-100 relative group">
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 group-focus-within:text-indigo-600 transition-colors">State</label>
+                        <select id="home-state" class="w-full bg-transparent border-none p-0 text-gray-900 font-bold focus:ring-0 cursor-pointer text-base outline-none">
+                            <option value="">Choose State</option>
+                            @foreach($states as $state)
+                                <option value="{{ $state }}">{{ $state }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="flex-1 px-5 py-3 relative group">
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 group-focus-within:text-indigo-600 transition-colors">City</label>
+                        <select id="home-city" class="w-full bg-transparent border-none p-0 text-gray-900 font-bold focus:ring-0 cursor-pointer text-base outline-none">
+                            <option value="">Choose City</option>
+                            @foreach($cities as $city)
+                                <option value="{{ $city }}">{{ $city }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="p-1.5">
+                        <button onclick="filterSaloons()" class="h-full w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-8 rounded-xl font-bold transition-all duration-300 shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 transform active:scale-95">
+                            FIND
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Trust Indicators -->
+                <div class="flex items-center gap-6 pt-4">
+                    <div class="flex -space-x-3">
+                        <img class="w-10 h-10 rounded-full border-2 border-[#1e1b4b] object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=64&h=64" alt="User">
+                        <img class="w-10 h-10 rounded-full border-2 border-[#1e1b4b] object-cover" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=64&h=64" alt="User">
+                        <img class="w-10 h-10 rounded-full border-2 border-[#1e1b4b] object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=64&h=64" alt="User">
+                        <div class="w-10 h-10 rounded-full border-2 border-[#1e1b4b] bg-gray-800 text-white flex items-center justify-center text-xs font-bold">+2k</div>
+                    </div>
+                    <div class="text-sm font-medium text-indigo-200">
+                        <span class="text-amber-400 font-bold">4.9/5</span> from happy customers
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Visual Composition -->
+            <div class="relative h-[600px] w-full flex items-center justify-center lg:justify-end perspective-1000">
+                <!-- Main Image Card -->
+                <div class="relative w-[380px] h-[520px] bg-gray-900 rounded-[32px] overflow-hidden shadow-2xl shadow-indigo-900/50 border-[8px] border-white/5 transform rotate-[-3deg] hover:rotate-0 transition-all duration-500 ease-out z-10 group">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10"></div>
+                    <img src="https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Salon Experience" class="w-full h-full object-cover opacity-90 group-hover:scale-110 transition-transform duration-700">
+                    
+                    <!-- Inner Content -->
+                    <div class="absolute bottom-0 left-0 right-0 p-8 z-20">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-white text-2xl font-bold">Luxe Barber</h3>
+                            <span class="bg-amber-400 text-indigo-900 text-xs font-black px-2 py-1 rounded">4.8 ★</span>
+                        </div>
+                        <p class="text-white/70 text-sm">Premium grooming experience</p>
+                    </div>
+                </div>
+
+                <!-- Floating Card: Live Queue (Top Right) -->
+                <div class="absolute top-[10%] -right-4 lg:right-0 bg-white/10 backdrop-blur-md border border-white/20 p-5 rounded-2xl shadow-xl z-20 animate-float-delayed w-64">
+                    <div class="flex items-center gap-4 mb-3">
+                        <div class="w-10 h-10 rounded-full bg-amber-400 flex items-center justify-center text-indigo-900 text-lg shadow-lg">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div>
+                            <p class="text-white font-bold leading-tight">Queue Status</p>
+                            <p class="text-indigo-200 text-xs">Live Updates</p>
                         </div>
                     </div>
-                    <div class="h-10 w-10 rounded-full bg-indigo-600 flex items-center justify-center text-white">
-                        <i class="fas fa-heart"></i>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs text-indigo-100 font-medium">
+                            <span>Warning Time</span>
+                            <span class="text-amber-300">12 mins</span>
+                        </div>
+                        <div class="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                            <div class="h-full w-[70%] bg-gradient-to-r from-amber-300 to-amber-500 rounded-full"></div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Secondary Floating Card -->
-            <div class="absolute top-40 left-0 w-[260px] glass-card-dark p-6 rounded-[30px] float-item-delay z-20 border border-white/20">
-                <div class="flex items-center gap-4 mb-4">
-                    <div class="w-12 h-12 rounded-full bg-amber-400 flex items-center justify-center text-indigo-900 text-xl">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <div>
-                        <p class="text-white font-bold">Queue Tracker</p>
-                        <p class="text-indigo-200 text-xs">Live Updates</p>
-                    </div>
-                </div>
-                <div class="space-y-3">
-                    <div class="h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div class="h-full w-2/3 bg-amber-400 rounded-full"></div>
-                    </div>
-                    <div class="flex justify-between text-xs text-indigo-200">
-                        <span>Your Turn</span>
-                        <span class="text-white font-bold">15 mins</span>
+                <!-- Floating Card: Booking (Bottom Left) -->
+                <div class="absolute bottom-[15%] left-0 lg:left-10 bg-white p-4 rounded-2xl shadow-xl shadow-black/20 z-30 animate-float w-[280px]">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div>
+                            <p class="text-gray-900 font-bold">Booking Confirmed</p>
+                            <p class="text-green-600 text-xs font-bold flex items-center gap-1">
+                                <i class="fas fa-check-circle"></i> Just now
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</section>
+</div>
 
 <!-- Stats Ticker -->
 <div class="bg-indigo-950 border-y border-white/5 py-12 relative overflow-hidden">
