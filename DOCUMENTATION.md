@@ -35,9 +35,10 @@ This is an advanced, production-ready Laravel 12 web application designed to man
 
 **Features**:
 - Saloon-specific dashboard
-- Queue Management (Join/Start/Complete/Cancel)
+- **Live Queue Management** (Real-time token tracking)
 - Service management
 - Staff management and service assignment
+- **Stripe/QR Recharge System** (Self-service extensions)
 - Appointment management
 - Review moderation
 - Coupon creation
@@ -45,8 +46,12 @@ This is an advanced, production-ready Laravel 12 web application designed to man
 
 **Key Routes**:
 - `GET /saloon-admin/dashboard` - Saloon dashboard
+- `GET /saloon-admin/queue` - Live Queue management
+- `POST /saloon-admin/queue/{appointment}/start` - Start serving token
+- `POST /saloon-admin/queue/{appointment}/done` - Mark token as completed
 - `GET /saloon-admin/services` - Manage services
 - `GET /saloon-admin/staff` - Manage staff
+- `GET /saloon-admin/recharge` - Purchase subscription plan
 - `GET /saloon-admin/appointments` - View appointments
 - `POST /saloon-admin/appointments/{appointment}/update-status` - Update appointment status
 
@@ -110,11 +115,13 @@ This is an advanced, production-ready Laravel 12 web application designed to man
 - Schedule: working_days (JSON), shift_start, shift_end
 
 #### appointments
-- Booking records
+- Booking and Live Queue records
 - Auto-generated appointment_number
+- **Token Number**: Daily auto-incrementing queue number
 - Relationships: belongsTo User, Saloon, Staff, Service
 - Status: pending, confirmed, in_progress, completed, cancelled, no_show
 - Pricing: total_amount, discount_amount, final_amount
+- Timestamps: joined_at, started_at, completed_at
 
 #### payments
 - Transaction records
@@ -321,13 +328,25 @@ calculateDiscount($amount)  // Calculate discount for given amount
 
 ### Business Visibility & Subscription Logic
 
+**Premium Multi-Plan System**:
+- **Silver**: Basic visibility, 1-month duration.
+- **Gold**: Higher search priority, 1-month duration.
+- **Platinum**: Home page placement, maximum visibility, 1-month duration.
+
 **Temporary Off System**:
 - Saloons without an active/paid subscription are automatically hidden from the public home page and listing.
 - Expired saloons show a warning in the Saloon Admin dashboard.
 - Customers attempting to visit a direct link of an unpaid saloon see a "Temporarily Closed" message.
 
-**Location Verification**:
-- User must select a **State** and then a **City** (or use the combined selection) to find local stylists.
+**Live Queue Management (Technical)**:
+- **Token Generation**: Each appointment created today for a saloon is assigned a sequential `token_number`.
+- **Status Lifecycle**: `pending` → `in_progress` → `completed` / `cancelled`.
+- **Real-time Interaction**: Admins can see "People ahead" count and manage the active queue.
+- **Auto-History**: Completed tokens are automatically archived to the history section.
+
+**Location Discovery (State & City)**:
+- The system uses a hierarchical location model.
+- Users must select a **State** and then a **City** (or use the combined search) to find local stylists.
 - The system prevents ghost listings by requiring location data on registration.
 
 ### DatabaseSeeder
@@ -556,6 +575,12 @@ chmod -R 775 storage bootstrap/cache
   - Dedicated Saloon Partner onboarding flow (Business Registration).
   - "Temporary Off" payment enforcement system.
   - Paid vs Unpaid analytics for platform owners.
+- **v1.2.0 Live Queue Update**:
+  - Full **Live Queue System** implementation with token generation.
+  - Real-time queue status tracking for customers (People ahead, wait time).
+  - Admin Queue Dashboard (Start/Done/Cancel).
+  - Stripe & QR-based recharge system integration.
+  - Multi-tier subscription plans (Silver, Gold, Platinum).
 
 ## Credits & Technologies
 
