@@ -89,8 +89,12 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            ${{ number_format($appointment->final_amount, 2) }}
+                            <div class="font-bold text-gray-800">₹{{ number_format($appointment->final_amount, 2) }}</div>
+                            @if($appointment->discount_amount > 0)
+                                <div class="text-[10px] text-green-600 font-bold uppercase">₹{{ number_format($appointment->discount_amount, 2) }} OFF</div>
+                            @endif
                         </td>
+
                         <td class="px-6 py-4 whitespace-nowrap">
                             @if($appointment->status == 'confirmed')
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Confirmed</span>

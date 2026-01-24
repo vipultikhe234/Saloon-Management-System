@@ -25,46 +25,45 @@ class DashboardController extends Controller
         $isSubscriptionActive = $saloon->isSubscriptionActive();
 
         $stats = [
-            'total_services' => Service::where('saloon_id', $saloon->id)->count(),
-            'active_services' => Service::where('saloon_id', $saloon->id)
-                ->where('is_active', true)->count(),
-            'total_staff' => Staff::where('saloon_id', $saloon->id)->count(),
-            'active_staff' => Staff::where('saloon_id', $saloon->id)
-                ->where('is_active', true)->count(),
-            'total_appointments' => Appointment::where('saloon_id', $saloon->id)->count(),
-            'today_appointments' => Appointment::where('saloon_id', $saloon->id)
-                ->whereDate('appointment_date', today())->count(),
-            'pending_appointments' => Appointment::where('saloon_id', $saloon->id)
-                ->where('status', 'pending')->count(),
-            'completed_appointments' => Appointment::where('saloon_id', $saloon->id)
-                ->where('status', 'completed')->count(),
-            'total_revenue' => Payment::whereHas('appointment', function($q) use ($saloon) {
-                $q->where('saloon_id', $saloon->id);
-            })->where('status', 'completed')->sum('amount'),
-            'monthly_revenue' => Payment::whereHas('appointment', function($q) use ($saloon) {
-                $q->where('saloon_id', $saloon->id);
-            })->where('status', 'completed')
-                ->whereMonth('created_at', now()->month)
-                ->sum('amount'),
+            'total_services' => $saloon->services()->count(),
+            'active_services' => $saloon->services()->where('is_active', true)->count(),
+            'total_staff' => $saloon->staff()->count(),
+            'active_staff' => $saloon->staff()->where('is_active', true)->count(),
+            'total_appointments' => $saloon->appointments()->count(),
+            'today_appointments' => $saloon->appointments()->whereDate('appointment_date', today())->count(),
+            'pending_appointments' => $saloon->appointments()->where('status', 'pending')->count(),
+            'completed_appointments' => $saloon->appointments()->where('status', 'completed')->count(),
+            'total_revenue' => DB::table('payments')
+                ->join('appointments', 'payments.appointment_id', '=', 'appointments.id')
+                ->where('appointments.saloon_id', $saloon->id)
+                ->where('payments.status', 'completed')
+                ->sum('payments.amount'),
+            'monthly_revenue' => DB::table('payments')
+                ->join('appointments', 'payments.appointment_id', '=', 'appointments.id')
+                ->where('appointments.saloon_id', $saloon->id)
+                ->where('payments.status', 'completed')
+                ->whereMonth('payments.created_at', now()->month)
+                ->sum('payments.amount'),
         ];
 
-        $todayAppointments = Appointment::with(['user', 'services', 'staff'])
-            ->where('saloon_id', $saloon->id)
+        $todayAppointments = $saloon->appointments()
+            ->with(['user', 'services', 'staff'])
             ->whereDate('appointment_date', today())
             ->orderBy('appointment_time')
             ->get();
 
-        $recentAppointments = Appointment::with(['user', 'services', 'staff'])
-            ->where('saloon_id', $saloon->id)
+        $recentAppointments = $saloon->appointments()
+            ->with(['user', 'services', 'staff'])
             ->latest()
             ->take(10)
             ->get();
 
-        $topServices = Service::where('saloon_id', $saloon->id)
+        $topServices = $saloon->services()
             ->withCount('appointments')
             ->orderByDesc('appointments_count')
             ->take(5)
             ->get();
+
 
         return view('saloon-admin.dashboard', compact(
             'saloon',

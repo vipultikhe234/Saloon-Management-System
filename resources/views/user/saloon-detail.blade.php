@@ -45,6 +45,36 @@
         </div>
     </div>
 
+    <!-- Promotions / Coupons -->
+    @if($coupons->count() > 0)
+    <div class="bg-indigo-50 rounded-xl p-6 border border-indigo-100">
+        <h3 class="font-bold text-indigo-900 mb-4 flex items-center gap-2">
+            <i class="fas fa-percentage"></i> Available Promotions
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            @foreach($coupons as $coupon)
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-indigo-200 flex justify-between items-center group">
+                <div>
+                    <p class="text-xs font-bold text-indigo-600 uppercase">{{ $coupon->title }}</p>
+                    <p class="text-lg font-black text-gray-800">
+                        @if($coupon->discount_type == 'percentage')
+                            {{ $coupon->discount_value }}% OFF
+                        @else
+                            ₹{{ $coupon->discount_value }} OFF
+                        @endif
+                    </p>
+                    <p class="text-[10px] text-gray-400">Use code: <span class="text-indigo-600 font-bold select-all">{{ $coupon->code }}</span></p>
+                </div>
+                <div class="bg-indigo-50 px-3 py-1 rounded-lg border border-dashed border-indigo-300 text-indigo-700 font-mono font-bold text-sm tracking-widest">
+                    {{ $coupon->code }}
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+    @endif
+
+
     <!-- Services Section -->
     <div class="bg-white rounded-xl shadow-lg p-6 relative">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">

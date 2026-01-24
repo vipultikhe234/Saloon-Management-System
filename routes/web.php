@@ -44,7 +44,10 @@ Route::middleware(['auth', 'role:user'])->prefix('user')->name('user.')->group(f
     Route::post('/queue/join/{saloon}', [\App\Http\Controllers\User\QueueController::class, 'join'])->name('queue.join');
     Route::get('/queue/status/{appointment}', [\App\Http\Controllers\User\QueueController::class, 'status'])->name('queue.status');
 
+    Route::post('/coupon/check', [BookingController::class, 'checkCoupon'])->name('coupon.check');
+
     Route::get('/appointments', [BookingController::class, 'index'])->name('appointments');
+
     Route::post('/appointment/{appointment}/cancel', [BookingController::class, 'cancel'])->name('appointment.cancel');
 });
 
@@ -102,7 +105,13 @@ Route::middleware(['auth', 'role:saloon_admin'])->prefix('saloon-admin')->name('
     Route::resource('appointments', SaloonAdminAppointment::class);
     Route::post('appointments/{appointment}/update-status', [SaloonAdminAppointment::class, 'updateStatus'])->name('appointments.update-status');
 
+    // Coupon Management
+    Route::resource('coupons', \App\Http\Controllers\SaloonAdmin\CouponController::class);
+    // Updated route name to match resource but with custom action
+    Route::post('coupons/{coupon}/toggle', [\App\Http\Controllers\SaloonAdmin\CouponController::class, 'toggleStatus'])->name('coupons.toggle');
+
     // Subscription/Recharge Routes
+
     Route::get('/recharge', [\App\Http\Controllers\SaloonAdmin\SubscriptionController::class, 'plans'])->name('subscription.plans');
     Route::post('/recharge/pay', [\App\Http\Controllers\SaloonAdmin\SubscriptionController::class, 'showQR'])->name('subscription.recharge');
     Route::post('/recharge/verify', [\App\Http\Controllers\SaloonAdmin\SubscriptionController::class, 'verifyPayment'])->name('subscription.verify');

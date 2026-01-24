@@ -73,10 +73,11 @@
                 <i class="fas fa-star"></i>
                 <span>Reviews</span>
             </a>
-            <a href="#" class="">
+            <a href="{{ route('saloon-admin.coupons.index') }}" class="{{ request()->routeIs('saloon-admin.coupons.*') ? 'active' : '' }}">
                 <i class="fas fa-percentage"></i>
                 <span>Coupons</span>
             </a>
+
             <a href="#" class="">
                 <i class="fas fa-chart-bar"></i>
                 <span>Reports</span>

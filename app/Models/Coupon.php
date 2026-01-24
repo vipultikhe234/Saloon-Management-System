@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Appointment;
+
 
 class Coupon extends Model
 {
@@ -67,4 +69,18 @@ class Coupon extends Model
 
         return $discount;
     }
+
+    public function canUserUse($userId)
+    {
+        if ($this->usage_per_user === null) {
+            return true;
+        }
+
+        $userUsageCount = Appointment::where('user_id', $userId)
+            ->where('coupon_id', $this->id)
+            ->count();
+
+        return $userUsageCount < $this->usage_per_user;
+    }
 }
+

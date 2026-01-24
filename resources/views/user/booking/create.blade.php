@@ -165,10 +165,31 @@
                         </ul>
                     </div>
 
-                    <div class="pt-6 border-t">
+                    <div class="pt-6 border-t space-y-3">
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-gray-500 font-medium">Total Price</span>
-                            <span id="summary-total-price" class="text-xl font-bold text-gray-800">$0.00</span>
+                            <span class="text-gray-500 font-medium">Subtotal</span>
+                            <span id="summary-total-price" class="text-lg font-bold text-gray-800">$0.00</span>
+                        </div>
+                        
+                        <!-- Coupon Input -->
+                        <div class="py-3 px-3 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                            <p class="text-[10px] text-gray-400 uppercase font-black mb-2">Have a Coupon?</p>
+                            <div class="flex gap-2">
+                                <input type="text" id="coupon-code-input" class="flex-grow px-3 py-2 text-xs font-bold border rounded-lg focus:ring-2 focus:ring-indigo-500 uppercase" placeholder="CODE">
+                                <button type="button" onclick="applyCoupon()" class="bg-indigo-600 text-white px-3 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700 transition">APPLY</button>
+                            </div>
+                            <div id="coupon-message" class="text-[10px] mt-2 hidden"></div>
+                            <input type="hidden" name="coupon_id" id="hidden-coupon-id">
+                        </div>
+
+                        <div id="discount-row" class="hidden flex justify-between items-center text-green-600 font-bold">
+                            <span class="text-sm">Discount</span>
+                            <span id="summary-discount-amount">-$0.00</span>
+                        </div>
+
+                        <div class="flex justify-between items-center pt-3 border-t">
+                            <span class="text-gray-800 font-black">Final Total</span>
+                            <span id="summary-final-price" class="text-2xl font-black text-indigo-600">$0.00</span>
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-gray-500 text-sm">Total Duration</span>
@@ -182,6 +203,7 @@
                         <p class="text-xl font-bold text-indigo-700">{{ $stats['expected_reach_time'] }}</p>
                         <p class="text-[10px] text-indigo-400 mt-2">Reach on time to avoid cancellation.</p>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -189,6 +211,9 @@
 </div>
 
 <script>
+    let currentDiscount = 0;
+    let currentSubtotal = 0;
+
     function toggleBookingMode(mode) {
         const profileFields = document.getElementById('profile-fields');
         const emailInput = document.getElementById('email');
@@ -233,11 +258,72 @@
             list.appendChild(li);
         });
 
+        currentSubtotal = total;
         document.getElementById('summary-total-price').textContent = '$' + total.toFixed(2);
         document.getElementById('summary-total-duration').textContent = duration + ' mins';
+        
+        recalculateFinal();
+    }
+
+    function recalculateFinal() {
+        const finalPrice = Math.max(0, currentSubtotal - currentDiscount);
+        document.getElementById('summary-final-price').textContent = '$' + finalPrice.toFixed(2);
+    }
+
+    async function applyCoupon() {
+        const code = document.getElementById('coupon-code-input').value;
+        const messageEl = document.getElementById('coupon-message');
+        const discountRow = document.getElementById('discount-row');
+        const discountEl = document.getElementById('summary-discount-amount');
+        const hiddenId = document.getElementById('hidden-coupon-id');
+
+        if (!code) return;
+
+        try {
+            const response = await fetch('{{ route('user.coupon.check') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    code: code,
+                    saloon_id: '{{ $saloon->id }}',
+                    amount: currentSubtotal
+                })
+            });
+
+            const data = await response.json();
+
+            messageEl.classList.remove('hidden');
+            if (data.success) {
+                messageEl.className = 'text-[10px] mt-2 text-green-600 font-bold';
+                messageEl.textContent = data.message;
+                
+                currentDiscount = data.discount;
+                hiddenId.value = data.coupon_id;
+                
+                discountRow.classList.remove('hidden');
+                discountEl.textContent = '-$' + data.discount.toFixed(2);
+                
+                recalculateFinal();
+            } else {
+                messageEl.className = 'text-[10px] mt-2 text-red-500 font-bold';
+                messageEl.textContent = data.message;
+                
+                // Reset discount if failed
+                currentDiscount = 0;
+                hiddenId.value = '';
+                discountRow.classList.add('hidden');
+                recalculateFinal();
+            }
+        } catch (error) {
+            console.error('Error applying coupon:', error);
+        }
     }
 
     // Initialize on load
     document.addEventListener('DOMContentLoaded', updateTotal);
 </script>
+
 @endsection

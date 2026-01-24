@@ -16,6 +16,7 @@ class Appointment extends Model
         'saloon_id',
         'staff_id',
         'service_id',
+        'coupon_id',
         'appointment_date',
         'appointment_time',
         'duration_minutes',
@@ -29,6 +30,12 @@ class Appointment extends Model
         'cancelled_at',
         'completed_at',
     ];
+
+    public function coupon()
+    {
+        return $this->belongsTo(Coupon::class);
+    }
+
 
     public function services()
     {

@@ -105,7 +105,6 @@ php artisan migrate:fresh --seed
 ---
 
 <div align="center">
-  <h3>Developed with ❤️ by Antigravity</h3>
   <p><i>Version 1.2.0 | January 2026</i></p>
   
   [Documentation](DOCUMENTATION.md) • [Project Summary](PROJECT_SUMMARY.md) • [Quickstart](QUICKSTART.md)

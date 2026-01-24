@@ -29,6 +29,47 @@ class BookingController extends Controller
         return view('user.booking.create', compact('saloon', 'services', 'staff', 'selectedServiceId'));
     }
 
+    public function checkCoupon(Request $request)
+    {
+        $request->validate([
+            'code' => 'required|string',
+            'saloon_id' => 'required|exists:saloons,id',
+            'amount' => 'required|numeric'
+        ]);
+
+        $coupon = \App\Models\Coupon::where('code', strtoupper($request->code))
+            ->where('saloon_id', $request->saloon_id)
+            ->where('is_active', true)
+            ->first();
+
+        if (!$coupon) {
+            return response()->json(['success' => false, 'message' => 'Invalid coupon code.']);
+        }
+
+        if (!$coupon->isValid()) {
+            return response()->json(['success' => false, 'message' => 'This coupon has expired or reached its usage limit.']);
+        }
+
+        if (Auth::check()) {
+            if (!$coupon->canUserUse(Auth::id())) {
+                return response()->json(['success' => false, 'message' => 'You have already used this coupon maximum times.']);
+            }
+        }
+
+        if ($coupon->min_purchase_amount && $request->amount < $coupon->min_purchase_amount) {
+            return response()->json(['success' => false, 'message' => 'Minimum order of ₹' . $coupon->min_purchase_amount . ' required for this coupon.']);
+        }
+
+        $discount = $coupon->calculateDiscount($request->amount);
+
+        return response()->json([
+            'success' => true,
+            'discount' => $discount,
+            'coupon_id' => $coupon->id,
+            'message' => 'Coupon applied successfully!'
+        ]);
+    }
+
     public function store(Request $request)
     {
         $rules = [
@@ -38,6 +79,7 @@ class BookingController extends Controller
             'staff_id' => 'nullable|exists:staff,id',
             'appointment_date' => 'required|date|after_or_equal:today',
             'appointment_time' => 'required',
+            'coupon_id' => 'nullable|exists:coupons,id',
         ];
 
         // If guest, require name. Password/Email only if they want an account.
@@ -58,7 +100,6 @@ class BookingController extends Controller
 
         // Handle Registration if requested
         $user = Auth::user();
-        $isNewUser = false;
         if (!Auth::check() && $request->filled('email')) {
             $user = User::create([
                 'name' => $request->guest_name,
@@ -67,7 +108,6 @@ class BookingController extends Controller
                 'role' => 'user',
             ]);
             Auth::login($user);
-            $isNewUser = true;
         }
 
         $services = Service::whereIn('id', $request->service_ids)->get();
@@ -76,16 +116,33 @@ class BookingController extends Controller
             return $s->discounted_price ?? $s->price;
         });
 
+        $discountAmount = 0;
+        $couponId = null;
+
+        if ($request->coupon_id) {
+            $coupon = \App\Models\Coupon::find($request->coupon_id);
+            if ($coupon && $coupon->isValid() && $coupon->saloon_id == $saloon->id) {
+                if (!Auth::check() || $coupon->canUserUse(Auth::id())) {
+                    $discountAmount = $coupon->calculateDiscount($totalAmount);
+                    $couponId = $coupon->id;
+                    $coupon->increment('times_used');
+                }
+            }
+        }
+
         $appointment = new Appointment();
         $appointment->saloon_id = $saloon->id;
         $appointment->user_id = Auth::id() ?: null;
         $appointment->guest_name = Auth::id() ? null : $request->guest_name;
         $appointment->staff_id = $request->staff_id;
+        $appointment->service_id = $services->first()->id; // Fallback for single service field
+        $appointment->coupon_id = $couponId;
         $appointment->appointment_date = $request->appointment_date;
         $appointment->appointment_time = $request->appointment_time;
         $appointment->duration_minutes = $totalMinutes;
         $appointment->total_amount = $totalAmount;
-        $appointment->final_amount = $totalAmount;
+        $appointment->discount_amount = $discountAmount;
+        $appointment->final_amount = $totalAmount - $discountAmount;
         $appointment->status = 'pending';
         $appointment->save();
 
@@ -100,7 +157,7 @@ class BookingController extends Controller
         // Create Payment Record
         $appointment->payment()->create([
             'user_id' => Auth::id(),
-            'amount' => $totalAmount,
+            'amount' => $appointment->final_amount,
             'status' => 'pending',
             'payment_method' => 'cash',
         ]);
@@ -109,11 +166,10 @@ class BookingController extends Controller
         $msg = "Success! Your reach time at the saloon is approx: " . $stats['expected_reach_time'];
 
         if (Auth::check()) {
-            // If they were already logged in or just registered/logged in
             return redirect()->route('user.dashboard')->with('success', $msg);
         }
 
-        // Guest redirect to home
         return redirect()->route('home')->with('success', $msg);
     }
 }
+
